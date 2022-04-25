@@ -73,6 +73,7 @@ class template {
         $savedata->id = $this->id;
         $savedata->name = $data->name;
         $savedata->timemodified = time();
+		if(isset($data->contextid)){ $savedata->contextid = $data->contextid;}
 
         $DB->update_record('customcert_templates', $savedata);
     }

@@ -66,7 +66,7 @@ require_capability('mod/customcert:manage', $context);
 // Set up the page.
 \mod_customcert\page_helper::page_setup($pageurl, $context, $title);
 
-if ($context->contextlevel == CONTEXT_SYSTEM) {
+if ($context->contextlevel == CONTEXT_SYSTEM || $context->contextlevel == CONTEXT_COURSECAT) {
     // We are managing a template - add some navigation.
     $PAGE->navbar->add(get_string('managetemplates', 'customcert'),
         new moodle_url('/mod/customcert/manage_templates.php'));
@@ -200,6 +200,11 @@ if ($data = $mform->get_data()) {
             unset($data->element_0);
             unset($data->addelement_0);
         }
+    }
+
+    // If within a module, contextid is ALWAYS the modules contextid, prevent changes!
+    if ($context->contextlevel == CONTEXT_MODULE) {
+        $data->contextid = $context->id;
     }
 
     // Save any data for the template.

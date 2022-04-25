@@ -24,7 +24,7 @@
 
 require_once('../../config.php');
 
-$contextid = optional_param('contextid', context_system::instance()->id, PARAM_INT);
+$contextid = optional_param('contextid', 0, PARAM_INT);
 $action = optional_param('action', '', PARAM_ALPHA);
 $confirm = optional_param('confirm', 0, PARAM_INT);
 $page = optional_param('page', 0, PARAM_INT);
@@ -39,6 +39,14 @@ if ($action) {
 if ($tid) {
     $template = $DB->get_record('customcert_templates', array('id' => $tid), '*', MUST_EXIST);
     $template = new \mod_customcert\template($template);
+}
+
+// Get all contexts the current user may assign templates
+$allowedcontexts = \mod_customcert\helper::get_user_manageable_contexts();
+
+// If no context is given as parameter: use the first one from the allowed-context-list
+if($contextid === 0){
+    $contextid = array_key_first($allowedcontexts);
 }
 
 $context = context::instance_by_id($contextid);
@@ -60,7 +68,7 @@ if ($tid && $action && confirm_sesskey()) {
     $PAGE->navbar->add(get_string('managetemplates', 'customcert'));
 }
 
-$heading = format_string($title, true, ['context' => $context]);
+$heading = format_string($context->get_context_name(), true, ['context' => $context]);
 
 if ($tid) {
     if ($action && confirm_sesskey()) {
@@ -121,10 +129,15 @@ if ($tid) {
     }
 }
 
+// Create context-selector-form
+$mform = new \mod_customcert\contextselector_form();
+
 $table = new \mod_customcert\manage_templates_table($context);
 $table->define_baseurl($pageurl);
 
 echo $OUTPUT->header();
+// Display context-selector-form
+$mform->display();
 echo $OUTPUT->heading($heading);
 $table->out($perpage, false);
 $url = new moodle_url('/mod/customcert/edit.php?contextid=' . $contextid);

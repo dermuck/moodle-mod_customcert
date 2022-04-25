@@ -41,6 +41,11 @@ if ($cm = $template->get_cm()) {
 }
 $template->require_manage();
 
+//If template to load is not in context SYSTEM: require manage-capability on loadtemplate to prevent user from loading any template
+if ($loadtemplate->get_context()->contextlevel != CONTEXT_SYSTEM){
+    $loadtemplate->require_manage();
+}
+
 if ($template->get_context()->contextlevel == CONTEXT_MODULE) {
     $customcert = $DB->get_record('customcert', ['id' => $cm->instance], '*', MUST_EXIST);
     $title = $customcert->name;

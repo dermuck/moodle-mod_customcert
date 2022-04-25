@@ -63,6 +63,14 @@ class edit_form extends \moodleform {
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required');
 
+		//Add a contextid-selector when creating a new template
+        if (!isset($this->_customdata['tid'])) {
+	        $contexts = \mod_customcert\helper::get_user_manageable_contexts();
+	        $mform->addElement('select', 'contextid', get_string('context', 'core_role'), $contexts);
+	        $mform->setType('contextid', PARAM_INT);
+	        $mform->addRule('contextid', null, 'required');
+        }
+		
         // Get the number of pages for this module.
         if (isset($this->_customdata['tid'])) {
             $this->tid = $this->_customdata['tid'];

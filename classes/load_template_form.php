@@ -47,18 +47,25 @@ class load_template_form extends \moodleform {
 
         // Get the context.
         $context = $this->_customdata['context'];
-        $syscontext = \context_system::instance();
 
         $mform->addElement('header', 'loadtemplateheader', get_string('loadtemplate', 'customcert'));
 
         // Display a link to the manage templates page.
-        if ($context->contextlevel != CONTEXT_SYSTEM && has_capability('mod/customcert:manage', $syscontext)) {
+        if ($context->contextlevel != CONTEXT_SYSTEM && $context->contextlevel != CONTEXT_COURSECAT && has_capability('mod/customcert:manage', \context_system::instance())) {
             $link = \html_writer::link(new \moodle_url('/mod/customcert/manage_templates.php'),
                 get_string('managetemplates', 'customcert'));
             $mform->addElement('static', 'managetemplates', '', $link);
         }
 
-        $arrtemplates = $DB->get_records_menu('customcert_templates', ['contextid' => $syscontext->id], 'name ASC', 'id, name');
+        //Select all templates in a context above this module
+        $parentcontextids = $context->get_parent_context_ids();
+        $sqlin = $DB->get_in_or_equal($parentcontextids);
+        $sql = 'SELECT cct.id, cct.name FROM {customcert_templates} cct 
+                    INNER JOIN {context} co ON co.id = cct.contextid 
+                    WHERE co.id '.$sqlin[0].'
+                    ORDER BY cct.name ASC;';
+        $arrtemplates = $DB->get_records_sql_menu($sql, $sqlin[1]);
+        
         if ($arrtemplates) {
             $templates = [];
             foreach ($arrtemplates as $key => $template) {

@@ -61,4 +61,42 @@ class helper {
 
         return implode(',', $alternatenames);
     }
+	
+	 /**
+     * Get an array of contexts which the current or given user should be allowed to   
+     * assign certificate templates. This is the system-context (contextlevel 10)
+     * and any top-level-coursecatagories (contextlevel 40 and depth 2) as far as the 
+     * user is granted the capability 'mod/customcert:manage' in the specific context.
+     * 
+     * Returns an associative array containing [contextid] => Name of the context 
+     *
+     * @param int|stdClass $user  userId or user-object (null means current user) 
+     * @return array(string) contexts the user my manage
+     */
+    public static function get_user_manageable_contexts($user = null) : array {
+        global $USER, $DB;
+        $return = array();
+        $systemcontext = \context_system::instance();
+        //fill $userid with current user or passed parameter value
+        if ($user === null) {
+            $userid = $USER->id;
+        } else {
+            $userid = is_object($user) ? $user->id : $user;
+        }
+
+        //add system-context if capability is granted
+        if(has_capability('mod/customcert:manage', $systemcontext, $userid)) {
+            $return[$systemcontext->id] = $systemcontext->get_context_name();
+        }
+        
+        //add all top-level-coursecategories where capability is granted
+        $cats = $DB->get_records('context', array('contextlevel' => CONTEXT_COURSECAT), null, 'id');
+        foreach ($cats as $cat) {
+            $context = \context::instance_by_id($cat->id);
+            if(has_capability('mod/customcert:manage', $context, $userid)) {
+                $return[$context->id] = $context->get_context_name();
+            }
+        }
+        return $return;
+    }
 }
