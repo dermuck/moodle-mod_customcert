@@ -36,6 +36,7 @@ if ($action) {
     $tid = optional_param('tid', 0, PARAM_INT);
 }
 
+require_login();
 if ($tid) {
     $template = $DB->get_record('customcert_templates', array('id' => $tid), '*', MUST_EXIST);
     $template = new \mod_customcert\template($template);
@@ -43,6 +44,9 @@ if ($tid) {
 
 // Get all contexts the current user may assign templates
 $allowedcontexts = \mod_customcert\helper::get_user_manageable_contexts();
+if(!$allowedcontexts) {
+    require_capability('mod/customcert:manage', CONTEXT_SYSTEM::instance());;
+}
 
 // If no context is given as parameter: use the first one from the allowed-context-list
 if($contextid === 0){
@@ -51,7 +55,6 @@ if($contextid === 0){
 
 $context = context::instance_by_id($contextid);
 
-require_login();
 require_capability('mod/customcert:manage', $context);
 
 $title = $SITE->fullname;

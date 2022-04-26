@@ -161,8 +161,8 @@ if ($deleting) {
 }
 
 if ($tid) {
-    $mform = new \mod_customcert\edit_form($pageurl, array('tid' => $tid));
-    // Set the name and contextid for the form.
+    $mform = new \mod_customcert\edit_form($pageurl, array('tid' => $tid, 'contextid' => $context->id));
+    // Set the name for the form.
     $mform->set_data(array('name' => $template->get_name(), 'contextid' => $context->id));
 } else {
     $mform = new \mod_customcert\edit_form($pageurl);

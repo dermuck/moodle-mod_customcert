@@ -63,13 +63,18 @@ class edit_form extends \moodleform {
         $mform->setType('name', PARAM_TEXT);
         $mform->addRule('name', null, 'required');
 
-		//Add a contextid-selector when the user is allowed to edit templates on system-level
-        if (has_capability('mod/customcert:manage', \context_system::instance())) {
-	        $contexts = \mod_customcert\helper::get_user_manageable_contexts();
-	        $mform->addElement('select', 'contextid', get_string('context', 'core_role'), $contexts);
-	        $mform->setType('contextid', PARAM_INT);
-	        $mform->addRule('contextid', null, 'required');
+        //Add a contextid-selector when contextlevel of template is not module
+        if(isset($this->_customdata['contextid'])) {
+            $contextlevel = $DB->get_field('context', 'contextlevel', array('id' => $this->_customdata['contextid']));
+            if($contextlevel != CONTEXT_MODULE) {
+                $contexts =
+                \mod_customcert\helper::get_user_manageable_contexts();
+                $mform->addElement('select', 'contextid', get_string('context', 'core_role'), $contexts);
+                $mform->setType('contextid', PARAM_INT);
+                $mform->addRule('contextid', null, 'required');
+            }
         }
+  
 		
         // Get the number of pages for this module.
         if (isset($this->_customdata['tid'])) {
