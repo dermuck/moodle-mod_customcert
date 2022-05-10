@@ -120,6 +120,7 @@ $string['leftmargin'] = 'Left margin';
 $string['leftmargin_help'] = 'This is the left margin of the certificate PDF in mm.';
 $string['listofissues'] = 'Recipients: {$a}';
 $string['load'] = 'Load';
+$string['loadingnotallowed'] = 'You are not allowed to load this template.';
 $string['loadtemplate'] = 'Load template';
 $string['loadtemplatemsg'] = 'Are you sure you wish to load this template? This will remove any existing pages and elements for this certificate.';
 $string['managetemplates'] = 'Manage templates';

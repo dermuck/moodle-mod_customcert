@@ -41,9 +41,9 @@ if ($cm = $template->get_cm()) {
 }
 $template->require_manage();
 
-//If template to load is not in context SYSTEM: require manage-capability on loadtemplate to prevent user from loading any template
-if ($loadtemplate->get_context()->contextlevel != CONTEXT_SYSTEM){
-    $loadtemplate->require_manage();
+//If template to load is not in context SYSTEM: ensure the given template belongs to a context ABOVE the context of the cm edited, to prevent user from loading ANY template
+if ($loadtemplate->get_context()->contextlevel != CONTEXT_SYSTEM) && !in_array($loadtemplate->get_contextid(), $template->get_context()->get_parent_context_ids())) {
+    redirect(new moodle_url('/mod/customcert/edit.php', array('tid' => $tid)),get_string('loadingnotallowed', 'customcert'),0,\core\output\notification::NOTIFY_ERROR);
 }
 
 if ($template->get_context()->contextlevel == CONTEXT_MODULE) {
