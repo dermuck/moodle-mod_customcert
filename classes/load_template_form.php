@@ -50,8 +50,9 @@ class load_template_form extends \moodleform {
 
         $mform->addElement('header', 'loadtemplateheader', get_string('loadtemplate', 'customcert'));
 
-        // Display a link to the manage templates page.
-        if ($context->contextlevel != CONTEXT_SYSTEM && $context->contextlevel != CONTEXT_COURSECAT && has_capability('mod/customcert:manage', \context_system::instance())) {
+        // Display a link to the manage templates page (if user has capability 'mod/customcert:manage' in system context or on any catergory context)
+        //        if ($context->contextlevel != CONTEXT_SYSTEM && $context->contextlevel != CONTEXT_COURSECAT && has_capability('mod/customcert:manage', \context_system::instance())) {
+        if (has_capability('mod/customcert:manage', \context_system::instance()) || !empty(\mod_customcert\helper::get_user_manageable_contexts())) {
             $link = \html_writer::link(new \moodle_url('/mod/customcert/manage_templates.php'),
                 get_string('managetemplates', 'customcert'));
             $mform->addElement('static', 'managetemplates', '', $link);
